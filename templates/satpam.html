@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Satpam — Lapor Pak VMS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Hero Header -->
+    <div class="bg-zinc-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl shadow-blue-950/15 border border-purple-500/20 relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute right-24 -bottom-20 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-600/20 text-blue-300 border border-blue-500/30 mb-2">
+                    Pos Keamanan • Role Satpam
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Monitoring &amp; Pencatatan Tamu
+                </h1>
+                <p class="text-sm text-zinc-400 mt-1">
+                    Catat kedatangan tamu baru, pantau persetujuan Direktur, dan lakukan check-out saat tamu keluar.
+                </p>
+            </div>
+            <a href="{{ url_for('satpam_dashboard') }}"
+               class="self-start sm:self-center inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition">
+                <svg class="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Segarkan Status
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total Tamu</p>
+            <p class="text-3xl font-extrabold text-zinc-950 mt-2">{{ stats.total }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Seluruh catatan kunjungan</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-purple-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-purple-600">Menunggu Izin</p>
+            <p class="text-3xl font-extrabold text-purple-700 mt-2">{{ stats.menunggu }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Menunggu keputusan Direktur</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-blue-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-blue-600">Diizinkan Masuk</p>
+            <p class="text-3xl font-extrabold text-blue-700 mt-2">{{ stats.diizinkan }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Sedang berada di area kantor</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Selesai / Keluar</p>
+            <p class="text-3xl font-extrabold text-zinc-900 mt-2">{{ stats.selesai }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Ditolak: {{ stats.ditolak }} tamu</p>
+        </div>
+    </div>
+
+    <!-- Main 2-Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Left Column: Form Catat Kedatangan Tamu -->
+        <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-zinc-950 px-6 py-4 border-b border-purple-500/25">
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></span>
+                    Catat Kedatangan Tamu
+                </h2>
+                <p class="text-xs text-zinc-400 mt-0.5">Isi data tamu untuk diajukan ke Direktur.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('satpam_checkin') }}" class="p-6 space-y-4">
+                <div>
+                    <label for="name" class="block text-xs font-semibold text-zinc-700 mb-1">
+                        Nama Lengkap Tamu <span class="text-purple-600">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" required placeholder="Contoh: Andi Pratama"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
+                    <div>
+                        <label for="company" class="block text-xs font-semibold text-zinc-700 mb-1">Instansi / Perusahaan</label>
+                        <input type="text" id="company" name="company" placeholder="PT / CV / Pribadi"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition" />
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-xs font-semibold text-zinc-700 mb-1">No. Telepon / HP</label>
+                        <input type="text" id="phone" name="phone" placeholder="0812xxxxxxxx"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="host_name" class="block text-xs font-semibold text-zinc-700 mb-1">Menemui / Divisi Tujuan</label>
+                    <input type="text" id="host_name" name="host_name" placeholder="Contoh: Direktur / Divisi Keuangan"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition" />
+                </div>
+
+                <div>
+                    <label for="purpose" class="block text-xs font-semibold text-zinc-700 mb-1">
+                        Keperluan Kunjungan <span class="text-purple-600">*</span>
+                    </label>
+                    <textarea id="purpose" name="purpose" rows="2" required placeholder="Jelaskan keperluan kunjungan tamu..."
+                              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition"></textarea>
+                </div>
+
+                <div>
+                    <label for="notes" class="block text-xs font-semibold text-zinc-700 mb-1">Catatan Tambahan</label>
+                    <input type="text" id="notes" name="notes" placeholder="Contoh: Membawa KTP / paket dokumen"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition" />
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md shadow-blue-600/20 transition">
+                    + Catat Tamu Masuk
+                </button>
+            </form>
+        </div>
+
+        <!-- Right Column: Daftar & Monitoring Tamu -->
+        <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-zinc-950">Daftar &amp; Status Izin Tamu</h2>
+                        <p class="text-xs text-zinc-500">Pantau keputusan Direktur dan catat waktu keluar (check-out).</p>
+                    </div>
+
+                    <!-- Search Form -->
+                    <form method="GET" action="{{ url_for('satpam_dashboard') }}" class="flex items-center gap-2">
+                        <input type="hidden" name="status" value="{{ status_filter }}" />
+                        <input type="text" name="q" value="{{ search_query }}" placeholder="Cari nama, kode, instansi..."
+                               class="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs w-48 sm:w-56 focus:outline-none focus:ring-2 focus:ring-blue-600" />
+                        <button type="submit"
+                                class="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition">
+                            Cari
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Status Filter Pills -->
+                <div class="flex flex-wrap gap-2">
+                    {% for st in ['Semua', 'Menunggu', 'Diizinkan', 'Ditolak', 'Selesai'] %}
+                    <a href="{{ url_for('satpam_dashboard', status=st, q=search_query) }}"
+                       class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition
+                       {% if status_filter == st %}
+                           bg-zinc-950 text-white border-zinc-950 shadow-sm
+                       {% else %}
+                           bg-slate-50 text-zinc-600 border-slate-200 hover:border-blue-400 hover:text-blue-700
+                       {% endif %}">
+                        {{ st }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Visitor Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+                            <th class="py-3.5 px-4">Tamu</th>
+                            <th class="py-3.5 px-4">Keperluan &amp; Tujuan</th>
+                            <th class="py-3.5 px-4">Waktu Masuk / Keluar</th>
+                            <th class="py-3.5 px-4">Status</th>
+                            <th class="py-3.5 px-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        {% if visitors %}
+                            {% for v in visitors %}
+                            <tr class="hover:bg-slate-50/80 transition">
+                                <td class="py-4 px-4 align-top">
+                                    <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-950 text-white mb-1">
+                                        {{ v.visitor_code }}
+                                    </span>
+                                    <p class="font-bold text-zinc-900">{{ v.name }}</p>
+                                    <p class="text-xs text-zinc-500">{{ v.company }}</p>
+                                    <p class="text-[11px] text-zinc-400">{{ v.phone }}</p>
+                                </td>
+                                <td class="py-4 px-4 align-top max-w-xs">
+                                    <p class="text-xs font-semibold text-blue-700 mb-0.5">Tujuan: {{ v.host_name }}</p>
+                                    <p class="text-xs text-zinc-700">{{ v.purpose }}</p>
+                                    {% if v.notes and v.notes != '-' %}
+                                    <p class="text-[11px] text-zinc-400 mt-1">Catatan: {{ v.notes }}</p>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4 align-top text-xs space-y-1 whitespace-nowrap">
+                                    <div>
+                                        <span class="text-zinc-400">Masuk:</span>
+                                        <span class="font-medium text-zinc-800 block">{{ v.check_in_time }}</span>
+                                    </div>
+                                    {% if v.check_out_time %}
+                                    <div>
+                                        <span class="text-zinc-400">Keluar:</span>
+                                        <span class="font-medium text-blue-700 block">{{ v.check_out_time }}</span>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4 align-top">
+                                    {% if v.status == 'Menunggu' %}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse"></span>
+                                        Menunggu
+                                    </span>
+                                    {% elif v.status == 'Diizinkan' %}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                        Diizinkan
+                                    </span>
+                                    {% elif v.status == 'Ditolak' %}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white">
+                                        Ditolak
+                                    </span>
+                                    {% if v.rejection_reason %}
+                                    <p class="text-[11px] text-zinc-500 mt-1">Alasan: {{ v.rejection_reason }}</p>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-zinc-700 border border-slate-200">
+                                        Selesai
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4 align-top text-right whitespace-nowrap">
+                                    {% if v.status == 'Diizinkan' %}
+                                    <form method="POST" action="{{ url_for('satpam_checkout', visitor_id=v.id) }}"
+                                          onsubmit="return confirm('Catat tamu {{ v.name }} sudah keluar (Check Out)?');">
+                                        <button type="submit"
+                                                class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-sm transition">
+                                            Check Out
+                                        </button>
+                                    </form>
+                                    {% elif v.status == 'Menunggu' %}
+                                    <span class="text-[11px] font-medium text-purple-600">Menunggu Direktur</span>
+                                    {% elif v.status == 'Selesai' %}
+                                    <span class="text-[11px] font-medium text-zinc-400">Sudah Keluar</span>
+                                    {% else %}
+                                    <span class="text-[11px] font-medium text-zinc-400">Tidak Masuk</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-sm text-zinc-400">
+                                    Belum ada data tamu yang sesuai dengan filter.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

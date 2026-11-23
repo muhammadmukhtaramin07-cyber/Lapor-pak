@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Lapor Pak VMS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 relative overflow-hidden flex items-center justify-center px-4 py-12">
+    <!-- Decorative Blue & Purple Glows -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/25 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/25 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative w-full max-w-md">
+        <!-- Logo Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 shadow-xl shadow-purple-600/30 mb-4">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Lapor Pak</h1>
+            <p class="text-sm text-zinc-400 mt-1">Sistem Manajemen Keluar Masuk Tamu</p>
+        </div>
+
+        <!-- White Card Form -->
+        <div class="bg-white rounded-2xl shadow-2xl shadow-black/50 border border-white/10 p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-zinc-900">Masuk ke Sistem</h2>
+            <p class="text-xs text-zinc-500 mt-1 mb-6">Gunakan akun Satpam atau Direktur untuk melanjutkan.</p>
+
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-xs font-semibold uppercase tracking-wider text-zinc-700 mb-1.5">
+                        Username
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        placeholder="Masukkan username"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                    />
+                </div>
+
+                <div>
+                    <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-zinc-700 mb-1.5">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Masukkan password"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-600/25 transition transform active:scale-[0.99]"
+                >
+                    Masuk Sekarang
+                </button>
+            </form>
+
+            <!-- Quick Fill Demo Accounts -->
+            <div class="mt-6 pt-5 border-t border-slate-100">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-2.5 text-center">
+                    Akun Demo Cepat
+                </p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button
+                        type="button"
+                        onclick="fillDemo('satpam1', 'satpam123')"
+                        class="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-left transition"
+                    >
+                        <span class="block text-xs font-bold text-blue-700">Satpam</span>
+                        <span class="block text-[11px] text-zinc-500">satpam1 / satpam123</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="fillDemo('direktur1', 'direktur123')"
+                        class="px-3 py-2 rounded-xl border border-purple-200 bg-purple-50/70 hover:bg-purple-100 text-left transition"
+                    >
+                        <span class="block text-xs font-bold text-purple-700">Direktur</span>
+                        <span class="block text-[11px] text-zinc-500">direktur1 / direktur123</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function fillDemo(user, pass) {
+        document.getElementById('username').value = user;
+        document.getElementById('password').value = pass;
+    }
+</script>
+{% endblock %}

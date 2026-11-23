@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Direktur — Lapor Pak VMS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Hero Header -->
+    <div class="bg-zinc-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl shadow-purple-950/20 border border-purple-500/30 relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-72 h-72 bg-purple-600/25 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute right-28 -bottom-20 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-600/25 text-purple-300 border border-purple-500/35 mb-2">
+                    Otoritas Persetujuan • Role Direktur
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Persetujuan &amp; Monitoring Tamu
+                </h1>
+                <p class="text-sm text-zinc-400 mt-1">
+                    Tinjau daftar tamu yang menunggu di pos keamanan dan berikan keputusan izin masuk atau tolak.
+                </p>
+            </div>
+            <a href="{{ url_for('direktur_dashboard') }}"
+               class="self-start sm:self-center inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition">
+                <svg class="w-4 h-4 text-purple-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                Segarkan Antrean
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-purple-300 shadow-sm ring-1 ring-purple-500/10">
+            <p class="text-xs font-semibold uppercase tracking-wider text-purple-600">Menunggu Keputusan</p>
+            <p class="text-3xl font-extrabold text-purple-700 mt-2">{{ stats.menunggu }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Perlu tindakan segera</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-blue-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-blue-600">Diizinkan Masuk</p>
+            <p class="text-3xl font-extrabold text-blue-700 mt-2">{{ stats.diizinkan }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Sedang berkunjung</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-zinc-600">Ditolak</p>
+            <p class="text-3xl font-extrabold text-zinc-950 mt-2">{{ stats.ditolak }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Tidak diberikan akses</p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Selesai Kunjungan</p>
+            <p class="text-3xl font-extrabold text-zinc-900 mt-2">{{ stats.selesai }}</p>
+            <p class="text-xs text-zinc-400 mt-1">Total tercatat: {{ stats.total }}</p>
+        </div>
+    </div>
+
+    <!-- Section 1: Antrean Tamu Menunggu Persetujuan -->
+    <section class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-zinc-950 flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
+                    Tamu Menunggu Persetujuan
+                </h2>
+                <p class="text-xs text-zinc-500">Berikan keputusan untuk mengizinkan masuk atau menolak kunjungan.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                {{ waiting_visitors|length }} Menunggu
+            </span>
+        </div>
+
+        {% if waiting_visitors %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for w in waiting_visitors %}
+            <div class="bg-white rounded-2xl border border-purple-200 shadow-sm p-6 flex flex-col justify-between gap-5 hover:shadow-md transition">
+                <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-950 text-white">
+                                    {{ w.visitor_code }}
+                                </span>
+                                <span class="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                                    Menunggu Izin
+                                </span>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-zinc-950">{{ w.name }}</h3>
+                            <p class="text-xs font-medium text-zinc-500">{{ w.company }} &bull; {{ w.phone }}</p>
+                        </div>
+                        <div class="text-right text-[11px] text-zinc-400 shrink-0">
+                            <span class="block font-semibold text-zinc-600">Tiba:</span>
+                            <span>{{ w.check_in_time }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3.5 border border-slate-100 space-y-1.5 text-xs">
+                        <p><span class="font-semibold text-blue-700">Menemui:</span> <span class="text-zinc-800">{{ w.host_name }}</span></p>
+                        <p><span class="font-semibold text-zinc-700">Keperluan:</span> <span class="text-zinc-700">{{ w.purpose }}</span></p>
+                        {% if w.notes and w.notes != '-' %}
+                        <p><span class="font-semibold text-zinc-500">Catatan Satpam:</span> <span class="text-zinc-600">{{ w.notes }}</span></p>
+                        {% endif %}
+                        <p class="text-[11px] text-zinc-400 pt-1">Dicatat oleh: {{ w.recorded_by }}</p>
+                    </div>
+                </div>
+
+                <!-- Approval Actions -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="grid grid-cols-2 gap-3">
+                        <form method="POST" action="{{ url_for('direktur_decide', visitor_id=w.id) }}">
+                            <input type="hidden" name="decision" value="approve" />
+                            <button type="submit"
+                                    class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-sm transition">
+                                ✓ Izinkan Masuk
+                            </button>
+                        </form>
+
+                        <button type="button"
+                                onclick="toggleRejectBox('reject-box-{{ w.id }}')"
+                                class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 transition">
+                            ✕ Tolak Kunjungan
+                        </button>
+                    </div>
+
+                    <!-- Collapsible Rejection Reason Form -->
+                    <form id="reject-box-{{ w.id }}" method="POST" action="{{ url_for('direktur_decide', visitor_id=w.id) }}"
+                          class="hidden bg-zinc-950 text-white rounded-xl p-3.5 space-y-2.5">
+                        <input type="hidden" name="decision" value="reject" />
+                        <label class="block text-[11px] font-semibold text-purple-300">
+                            Alasan Penolakan (opsional):
+                        </label>
+                        <input type="text" name="rejection_reason" placeholder="Contoh: Sedang ada rapat internal / jadwal penuh"
+                               class="w-full px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                        <div class="flex justify-end gap-2">
+                            <button type="button" onclick="toggleRejectBox('reject-box-{{ w.id }}')"
+                                    class="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-white">
+                                Batal
+                            </button>
+                            <button type="submit"
+                                    class="px-3.5 py-1.5 rounded-lg text-[11px] font-bold bg-purple-600 hover:bg-purple-700 text-white transition">
+                                Konfirmasi Tolak
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+            <p class="text-sm font-semibold text-zinc-700">Tidak ada tamu yang sedang menunggu persetujuan.</p>
+            <p class="text-xs text-zinc-400 mt-1">Semua permintaan kunjungan telah diproses.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Section 2: Riwayat Keputusan & Monitoring Seluruh Tamu -->
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-zinc-950">Riwayat Keputusan &amp; Data Tamu</h2>
+                    <p class="text-xs text-zinc-500">Log seluruh tamu beserta status persetujuan dan waktu keluar.</p>
+                </div>
+
+                <form method="GET" action="{{ url_for('direktur_dashboard') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="status" value="{{ status_filter }}" />
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Cari nama, kode, instansi..."
+                           class="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs w-48 sm:w-56 focus:outline-none focus:ring-2 focus:ring-purple-600" />
+                    <button type="submit"
+                            class="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition">
+                        Cari
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                {% for st in ['Semua', 'Menunggu', 'Diizinkan', 'Ditolak', 'Selesai'] %}
+                <a href="{{ url_for('direktur_dashboard', status=st, q=search_query) }}"
+                   class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition
+                   {% if status_filter == st %}
+                       bg-zinc-950 text-white border-zinc-950 shadow-sm
+                   {% else %}
+                       bg-slate-50 text-zinc-600 border-slate-200 hover:border-purple-400 hover:text-purple-700
+                   {% endif %}">
+                    {{ st }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+                        <th class="py-3.5 px-4">Tamu</th>
+                        <th class="py-3.5 px-4">Keperluan &amp; Tujuan</th>
+                        <th class="py-3.5 px-4">Waktu Kunjungan</th>
+                        <th class="py-3.5 px-4">Keputusan</th>
+                        <th class="py-3.5 px-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    {% if all_visitors %}
+                        {% for v in all_visitors %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-4 px-4 align-top">
+                                <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-zinc-950 text-white mb-1">
+                                    {{ v.visitor_code }}
+                                </span>
+                                <p class="font-bold text-zinc-900">{{ v.name }}</p>
+                                <p class="text-xs text-zinc-500">{{ v.company }}</p>
+                            </td>
+                            <td class="py-4 px-4 align-top max-w-xs">
+                                <p class="text-xs font-semibold text-blue-700 mb-0.5">Tujuan: {{ v.host_name }}</p>
+                                <p class="text-xs text-zinc-700">{{ v.purpose }}</p>
+                            </td>
+                            <td class="py-4 px-4 align-top text-xs space-y-1 whitespace-nowrap">
+                                <div><span class="text-zinc-400">Masuk:</span> <span class="text-zinc-800">{{ v.check_in_time }}</span></div>
+                                {% if v.check_out_time %}
+                                <div><span class="text-zinc-400">Keluar:</span> <span class="text-blue-700 font-medium">{{ v.check_out_time }}</span></div>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 align-top text-xs">
+                                {% if v.decision_time %}
+                                <p class="font-semibold text-zinc-800">{{ v.decision_by }}</p>
+                                <p class="text-[11px] text-zinc-400">{{ v.decision_time }}</p>
+                                {% if v.rejection_reason %}
+                                <p class="text-[11px] text-purple-700 mt-1">Alasan: {{ v.rejection_reason }}</p>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-zinc-400">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-4 align-top">
+                                {% if v.status == 'Menunggu' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                    Menunggu
+                                </span>
+                                {% elif v.status == 'Diizinkan' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                                    Diizinkan
+                                </span>
+                                {% elif v.status == 'Ditolak' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-950 text-white">
+                                    Ditolak
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-zinc-700 border border-slate-200">
+                                    Selesai
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-sm text-zinc-400">
+                                Belum ada data tamu yang ditemukan.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+    function toggleRejectBox(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.toggle('hidden');
+        }
+    }
+</script>
+{% endblock %}
